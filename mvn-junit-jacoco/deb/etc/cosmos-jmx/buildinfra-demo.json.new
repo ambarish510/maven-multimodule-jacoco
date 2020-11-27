@@ -1,0 +1,40 @@
+{
+  "servers": [
+    {
+      "port": "_JMX_PORT_",
+      "host": "_HOSTNAME_",
+      "process": "_PACKAGE_",
+      "queries": [
+        {
+          "obj" : "java.lang:type=GarbageCollector,name=*",
+          "attr" : ["CollectionCount","CollectionTime","LastGcInfo"]
+        },
+        {
+          "obj" : "java.lang:type=Memory"
+        },
+        {
+          "obj" : "java.lang:type=MemoryPool,name=*",
+          "attr" : ["Usage"]
+        },
+        {
+          "obj" : "java.lang:type=OperatingSystem"
+        },
+        {
+          "obj" : "java.lang:type=Runtime,name=*",
+          "attr" : ["Uptime"]
+        },
+        {
+          "obj" : "java.lang:type=Threading,name=*",
+          "attr" : ["ThreadCount"]
+        },
+        {
+          "obj" : "metrics:name=*"
+        },
+        {
+          "obj" : "org.apache.camel:context=camel-1,type=routes,name=*"
+        }
+      ],
+      "numQueryThreads" : 2
+    }
+  ]
+}

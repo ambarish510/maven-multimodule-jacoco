@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -x
+
+CMD="$1"
+
+if [ "$CMD" == "remove" -o "$CMD" == "upgrade" ]; then
+  echo "Stopping _PACKAGE_"
+  /etc/init.d/_PACKAGE_ stop
+fi

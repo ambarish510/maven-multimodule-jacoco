@@ -1,0 +1,18 @@
+ruleset(name = "build_metrics_collector_logs" ) {
+  set $!cluster = "build-infra";
+  call relay.htp
+}
+
+input(type="imfile" File="_LOG_DIR_/build_metrics_request.log"
+  Tag="plain,log.save.to.idx,log.idx.r2.2w,log.save.to.fs,log.fs.r2.2m,_PACKAGE_,build-metrics-collector-request"
+  Severity="info"
+  ruleset="relay.htp"
+  readmode="2"
+)
+
+input(type="imfile" File="_LOG_DIR_/build_metrics.log"
+  Tag="plain,log.save.to.idx,log.idx.r2.2w,log.save.to.fs,log.fs.r2.2m,_PACKAGE_,build-metrics"
+  Severity="warn"
+  ruleset="relay.htp"
+  readmode="2"
+)

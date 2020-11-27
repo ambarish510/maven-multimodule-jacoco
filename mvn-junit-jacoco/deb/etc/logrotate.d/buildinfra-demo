@@ -1,0 +1,13 @@
+_LOG_DIR_/_PACKAGE_.out {
+    size 1024M
+    rotate 5
+    compress
+    copytruncate
+}
+
+_LOG_DIR_/_PACKAGE_.err {
+    size 1024M
+    rotate 5
+    compress
+    copytruncate
+}

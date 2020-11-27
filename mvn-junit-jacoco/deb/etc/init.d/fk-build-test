@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set +e
+
+if [ `id -u` -ne 0 ]; then
+  echo "You need root privileges to run this script"
+  exit 1
+fi
+
+export PACKAGE_HOME=/usr/share/fk-build-test
+. /lib/lsb/init-functions
+. $PACKAGE_HOME/depvars.sh
+
+function start() {
+  . $PACKAGE_HOME/start.sh
+}
+
+function stop() {
+  . $PACKAGE_HOME/stop.sh
+}
+
+function status() {
+  . $PACKAGE_HOME/status.sh
+}
+
+function health() {
+  . $PACKAGE_HOME/health.sh
+}
+
+function cleanup() {
+  . $PACKAGE_HOME/cleanup.sh
+}
+
+export CMD_OPTS="$2"
+
+# Define other required variables
+case "$1" in
+  start) start ;;
+  stop) stop ;;
+  status) status ;;
+  health) health ;;
+  cleanup) cleanup ;;
+  restart) 
+    stop
+    start
+    ;;
+  *)
+    log_success_msg "Usage: $0 {start|stop|status|health|cleanup|restart}"
+    exit 1
+    ;;
+esac

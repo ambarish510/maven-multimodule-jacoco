@@ -1,0 +1,7 @@
+Package: fk-build-test
+Version: 1._VERSION_
+Section: flipkart/buildinfra-demo
+Depends: cosmos-collectd, cosmos-jmx, fk-config-service-confd, oracle-java8-jdk, stream-relay
+Architecture: all
+Maintainer: Build Infra Team <e2e-qe@flipkart.com>
+Description: Build-Infra fk-build-test

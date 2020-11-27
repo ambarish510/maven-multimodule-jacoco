@@ -1,0 +1,89 @@
+#! /bin/bash -e
+
+set -x
+
+ENV=stage
+PACKAGE=fk-build-test
+USER=fk-build-test
+GROUP=fk-build-infra
+COSMOS_DIR=/etc/cosmos-jmx
+LOG_AGG_DIR=/etc/rsyslog.d
+LOG_DIR=/var/log/flipkart/fk-build-test
+
+CMD="$1"
+
+die () {
+  echo "$PACKAGE postinst error: $*"
+  echo -e "\033[31m ================================\033[0m"
+  echo -e "\033[31m Deployment FAILED on $HOSTNAME\033[0m"
+  echo -e "\033[31m ================================\033[0m"
+  exit 2
+}
+
+function configure_cosmos {
+  echo "Configuring cosmos..."
+  cp $COSMOS_DIR/${1}.new $COSMOS_DIR/$1
+  chown cosmos:cosmos $COSMOS_DIR/$1
+  chmod 775 $COSMOS_DIR/$1
+  /etc/init.d/cosmos-jmx restart || true
+}
+
+function configure_log_agg() {
+  if [ ! -f $1 ]; then
+    echo "Configuring log aggregation..."
+    mv ${1}.new $1
+    /etc/init.d/rsyslog restart || true
+  fi
+}
+
+if [ "$CMD" == "configure" ]; then
+  if ! getent group $GROUP > /dev/null; then
+    groupadd $GROUP
+  fi
+
+  if ! getent passwd $USER > /dev/null; then
+    adduser --system --home /usr/share/$PACKAGE --no-create-home \
+    --ingroup $GROUP --disabled-password --shell /bin/false \
+    $USER
+  fi
+
+  chown -R $USER:$GROUP /usr/share/$PACKAGE
+  chown -R $USER:$GROUP /etc/$PACKAGE
+  chown -R $USER:$GROUP $LOG_DIR
+
+  echo "$ENV-$PACKAGE" > /etc/default/cosmos-service
+
+  sed -i -e "s#_HOSTNAME_#`hostname`#g" "$COSMOS_DIR/buildinfra-demo.json.new"
+
+  if [ ! -f $COSMOS_DIR/buildinfra-demo.json ]; then
+    configure_cosmos buildinfra-demo.json
+  fi
+
+  configure_log_agg $LOG_AGG_DIR/40-buildinfra-demo.conf
+
+  /etc/init.d/fk-config-service-confd restart
+
+  i=0
+  while [ ! -f "/etc/$PACKAGE/buildinfra-demo.properties" ] && [ $i -lt 10 ]
+  do
+    echo "File buildinfra-demo.properties not yet created. Will wait..."
+    i=$[$i+1]
+    sleep 1
+  done
+
+  # Commenting the script to start the service after installation
+  #/etc/init.d/$PACKAGE stop
+  #/etc/init.d/$PACKAGE start
+
+  # TODO This is to ensure these services are up
+  # sometimes they fail to start
+  /etc/init.d/cosmos-jmx restart
+  /etc/init.d/cosmos-collectd restart
+  /etc/init.d/rsyslog restart
+fi
+
+echo -e "\033[32m ================================\033[0m"
+echo -e "\033[32m BUILD Completed on $HOSTNAME\033[0m"
+echo -e "\033[32m ================================\033[0m"
+
+exit 0

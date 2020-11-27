@@ -1,0 +1,6 @@
+[template]
+prefix="/prod-build-metrics-collector"
+src = "prod-build-metrics-collector.tmpl"
+dest = "/etc/build-metrics-collector/build-metrics-collector.properties"
+keys = ["/server.port","/logging.file.max-size","/logging.path","/spring.data.mongodb.host","/spring.data.mongodb.port",
+"/spring.data.mongodb.database","/management.endpoints.web.exposure.include","/management.endpoint.health.show-details"]

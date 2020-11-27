@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -x
+
+CMD="$1"
+
+if [ "$CMD" == "remove" -o "$CMD" == "upgrade" ]; then
+  echo "Stopping fk-build-test"
+  /etc/init.d/fk-build-test stop
+fi
